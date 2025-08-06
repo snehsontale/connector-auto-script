@@ -4,7 +4,7 @@ metadata:
   name: tstbomtitls-connector-psql-sink-rmi-vips
   namespace: cfk-rmi-vips-testenv-sink-psql-jdbc
   annotations:
-    configsync.gke.io/cluster-name-selector: itd-dev-uswest2-anthos-aws-kyberno-cluster
+    configsync.gke.io/cluster-name-selector: cluster
 spec:
   class: "io.confluent.connect.jdbc.JdbcSinkConnector"
   taskMax: 3
@@ -13,7 +13,7 @@ spec:
   configs:
     connection.user: "${file:/mnt/secrets/testdb-credentials/db.txt:user}"
     connection.password: "${file:/mnt/secrets/testdb-credentials/db.txt:password}"
-    connection.url: "jdbc:postgresql://pos-t-cab.enterprisedb.dev.paccar.cloud:5432/CAB_TEST?verifyServerCertificate=false&useSSL=true&requireSSL=true"
+    connection.url: "jdbc:postgresql://server:5432/CAB_TEST?verifyServerCertificate=false&useSSL=true&requireSSL=true"
     topics: "kt_itd_test_aftersales_rmi_vips_cdc.ChassisAsBuiltTest.dbo.WrkVIPSBOMTitles_1"
     ssl.mode: "prefer"
     insert.mode: "UPSERT"
@@ -32,9 +32,9 @@ spec:
     delete.enabled: "true"
     consumer.override.group.id: "k_itd_ren_aftersales_rmi_vips_cdc_test_svc444"
     key.converter: "io.confluent.connect.avro.AvroConverter"
-    key.converter.schema.registry.url: "https://psrc-k0w8v.us-central1.gcp.confluent.cloud"
+    key.converter.schema.registry.url: "https://server"
     value.converter: "io.confluent.connect.avro.AvroConverter"
-    value.converter.schema.registry.url: "https://psrc-k0w8v.us-central1.gcp.confluent.cloud"
+    value.converter.schema.registry.url: "https://server"
     key.converter.basic.auth.credentials.source: "USER_INFO"
     key.converter.basic.auth.user.info: "${file:/mnt/secrets/user-info/user-info.txt:userinfo}"
     value.converter.basic.auth.credentials.source: "USER_INFO"
@@ -44,4 +44,5 @@ spec:
     transforms.dropCC.blacklist: "__deleted,__ts_ms,__op"
     transforms.dropCC.type: "org.apache.kafka.connect.transforms.ReplaceField$Value"
   restartPolicy:
+
      type: OnFailure
