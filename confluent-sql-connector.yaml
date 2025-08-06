@@ -1,0 +1,86 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: connector-sql-anthos-rmi-vips-test
+  namespace: cfk-rmi-vips-testenv-source-sqlserver-kafka
+  annotations:
+    configsync.gke.io/cluster-name-selector: itd-dev-uswest2-anthos-aws-kyberno-cluster
+spec:
+  class: "io.debezium.connector.sqlserver.SqlServerConnector"
+  taskMax: 1
+  connectClusterRef:
+    name: connect-rmi-vips-src-sql-anthos
+  configs:
+    database.dbname: "${file:/mnt/secrets/db-credentials/db.txt:dbname}"
+    database.names: "${file:/mnt/secrets/db-credentials/db.txt:dbname}"
+    database.hostname: "${file:/mnt/secrets/db-credentials/db.txt:hostname}"
+    database.password: "${file:/mnt/secrets/db-credentials/db.txt:password}"
+    database.port: "${file:/mnt/secrets/db-credentials/db.txt:port}"
+    database.server.name: "kt_itd_test_aftersales_rmi_vips_cdc.ChassisAsBuiltTest_1"
+    database.user: "${file:/mnt/secrets/db-credentials/db.txt:user}"
+    database.ssl.truststore: "${file:/mnt/secrets/paccarcacert/PaccarCACert.jks}"
+    database.ssl.truststore.password: "${file:/mnt/secrets/paccarcacert/jksPassword.txt:jksPassword}"
+    database.encrypt: "false"
+    schema.history.internal.kafka.bootstrap.servers: "pkc-lgk0v.us-west1.gcp.confluent.cloud:9092"
+    schema.history.internal.kafka.topic: "kt_itd_test_aftersales_rmi_vips_cdc_internal_1"
+    schema.history.internal.producer.sasl.jaas.config: "${file:/mnt/secrets/jaas-config/secret.txt:jaasconfig}"
+    schema.history.internal.producer.sasl.mechanism: "PLAIN"
+    schema.history.internal.producer.security.protocol: "SASL_SSL"
+    schema.history.internal.consumer.sasl.jaas.config: "${file:/mnt/secrets/jaas-config/secret.txt:jaasconfig}"
+    schema.history.internal.consumer.sasl.mechanism: "PLAIN"
+    schema.history.internal.consumer.security.protocol: "SASL_SSL"
+    schema.history.internal.consumer.group.id: "k_itd_ren_aftersales_rmi_vips_cdc_test_svc1515"
+    key.converter: "io.confluent.connect.avro.AvroConverter"
+    key.converter.schema.registry.url: "https://psrc-k0w8v.us-central1.gcp.confluent.cloud"
+    value.converter: "io.confluent.connect.avro.AvroConverter"
+    value.converter.schema.registry.url: "https://psrc-k0w8v.us-central1.gcp.confluent.cloud"
+    key.converter.basic.auth.credentials.source: "USER_INFO"
+    key.converter.basic.auth.user.info: "${file:/mnt/secrets/user-info/user-info.txt:userinfo}"
+    value.converter.basic.auth.credentials.source: "USER_INFO"
+    value.converter.basic.auth.user.info: "${file:/mnt/secrets/user-info/user-info.txt:userinfo}"
+    table.include.list: "ChassisAsBuiltTest.dbo.debezium_signal,dbo.Chassis,dbo.ChassisModel,dbo.ChassisModelOption,dbo.PhysicalLocation,dbo.WrkVIPSTruckNotes,dbo.ChassisEngine,dbo.PseudoBOMFieldType,dbo.WrkVIPSDAFPart,dbo.WrkVIPSEmissionRelatedParts,dbo.WrkCABItemVersion,dbo.WrkVIPSFrameLayout,dbo.WrkVIPSPublishedPageAssemblyExpand,dbo.WrkVIPSItemVersion,dbo.WrkVIPSServiceNet,dbo.WrkVIPSSupercession,dbo.WrkVIPSPublishedPage,dbo.WrkVIPSChassis,dbo.WrkVIPSPublishedPartApplication,dbo.WrkVIPSPart,dbo.WrkVIPSBOMTitles"
+    signal.data.collection: "ChassisAsBuiltTest.dbo.debezium_signal"
+    snapshot.max.threads: "3"
+    snapshot.fetch.size: "2000"
+    snapshot.delay.ms: "0"
+    snapshot.locking.mode: "none"
+ 
+    # max.batch.size: "3072000"
+    # max.request.size: "2097164"
+    # max.queue.size.in.bytes: "78643200"
+    # max.iteration.transactions: "10000"
+    # max.queue.size: "4000000"
+ 
+    # batch.size: "3072000"
+    # linger.ms: "500"
+    buffer.memory: "335544320"
+    receive.buffer.bytes: "26214400"
+    send.buffer.bytes: "2097164"
+
+  
+ 
+    producer.override.batch.size: "3072000"
+    producer.override.linger.ms: "500"
+    producer.override.buffer.memory: "335544320"
+    producer.override.max.request.size: "2097164"
+    producer.override.receive.buffer.bytes: "26214400"
+    producer.override.send.buffer.bytes: "2097164"
+    group.id: "k_itd_ren_aftersales_rmi_vips_cdc_test_svc_testcdc"
+    topic.prefix: "kt_itd_test_aftersales_rmi_vips_cdc"
+    confluent.topic.bootstrap.servers: "pkc-lgk0v.us-west1.gcp.confluent.cloud:9092"
+    time.precision.mode: connect
+    decimal.handling.mode: double
+    transforms: "convertTimezone,unwrap,addTopicSuffix"
+    transforms.unwrap.type: "io.debezium.transforms.ExtractNewRecordState"
+    transforms.unwrap.drop.tombstones: "false"
+    transforms.unwrap.add.fields: "op,ts_ms"
+    transforms.unwrap.add.headers: "db"
+    transforms.unwrap.delete.handling.mode: "rewrite"
+    transforms.addTopicSuffix.type: "org.apache.kafka.connect.transforms.RegexRouter"
+    transforms.addTopicSuffix.regex: "(.*)"
+    transforms.addTopicSuffix.replacement: "$1_1"
+    transforms.convertTimezone.type: "io.debezium.transforms.TimezoneConverter"
+    transforms.convertTimezone.converted.timezone: "America/Los_Angeles"
+    transforms.convertTimezone.include.list: "source:ChassisAsBuiltTest.dbo.WrkVIPSChassis:ChassisBuildDate,ChassisAsBuiltTest.dbo.ChassisModel:Timestamp,ChassisAsBuiltTest.dbo.ChassisModelOption:Timestamp"
+  restartPolicy:
+     type: OnFailure

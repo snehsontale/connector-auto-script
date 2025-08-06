@@ -1,0 +1,47 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: tstbomtitls-connector-psql-sink-rmi-vips
+  namespace: cfk-rmi-vips-testenv-sink-psql-jdbc
+  annotations:
+    configsync.gke.io/cluster-name-selector: itd-dev-uswest2-anthos-aws-kyberno-cluster
+spec:
+  class: "io.confluent.connect.jdbc.JdbcSinkConnector"
+  taskMax: 3
+  connectClusterRef:
+    name: connect-jdbc-rmi-vips-psql
+  configs:
+    connection.user: "${file:/mnt/secrets/testdb-credentials/db.txt:user}"
+    connection.password: "${file:/mnt/secrets/testdb-credentials/db.txt:password}"
+    connection.url: "jdbc:postgresql://pos-t-cab.enterprisedb.dev.paccar.cloud:5432/CAB_TEST?verifyServerCertificate=false&useSSL=true&requireSSL=true"
+    topics: "kt_itd_test_aftersales_rmi_vips_cdc.ChassisAsBuiltTest.dbo.WrkVIPSBOMTitles_1"
+    ssl.mode: "prefer"
+    insert.mode: "UPSERT"
+    table.types: "TABLE"
+    table.name.format: "wrkvipsbomtitles"
+    db.timezone: "America/Los_Angeles"
+    pk.mode: "record_key"
+    pk.fields: "BOMGroup,DIV_CD"
+    auto.create: "true"
+    auto.evolve: "true"
+    quote.sql.identifiers: "NEVER"
+    batch.sizes: "3000"
+    max.poll.interval.ms: "300000"
+    max.poll.records: "500"
+    tasks.max: "3"
+    delete.enabled: "true"
+    consumer.override.group.id: "k_itd_ren_aftersales_rmi_vips_cdc_test_svc444"
+    key.converter: "io.confluent.connect.avro.AvroConverter"
+    key.converter.schema.registry.url: "https://psrc-k0w8v.us-central1.gcp.confluent.cloud"
+    value.converter: "io.confluent.connect.avro.AvroConverter"
+    value.converter.schema.registry.url: "https://psrc-k0w8v.us-central1.gcp.confluent.cloud"
+    key.converter.basic.auth.credentials.source: "USER_INFO"
+    key.converter.basic.auth.user.info: "${file:/mnt/secrets/user-info/user-info.txt:userinfo}"
+    value.converter.basic.auth.credentials.source: "USER_INFO"
+    value.converter.basic.auth.user.info: "${file:/mnt/secrets/user-info/user-info.txt:userinfo}"
+    key.converter.schemas.enable: "true"
+    transforms: "dropCC"
+    transforms.dropCC.blacklist: "__deleted,__ts_ms,__op"
+    transforms.dropCC.type: "org.apache.kafka.connect.transforms.ReplaceField$Value"
+  restartPolicy:
+     type: OnFailure

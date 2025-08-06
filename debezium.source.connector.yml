@@ -1,0 +1,48 @@
+    connector.class: io.debezium.connector.sqlserver.SqlServerConnector
+    database.hostname: 
+    database.port: "1433"
+    database.user: svc_VC_Confluent
+    database.password: 
+    database.names: IDCards
+    database.server.name: MU-HRP-D02
+    table.include.list: dbo.ALL_ACCOUNT_HISTORY_FACT
+    topic.prefix: DW_HRP
+    topic.creation.enable: "true"
+    topic.creation.default.partitions: "3"
+    topic.creation.default.replication.factor: "3"
+    schema.history.internal.kafka.bootstrap.servers: lkc-ygk5no-pd0j1l.southcentralus.azure.glb.confluent.cloud:9092
+    schema.history.internal.kafka.topic: schemahistory.HRPDW
+    database.encrypt: "false"
+    errors.retry.timeout: "2"
+    errors.retry.delay.max.ms: "100"
+    errors.tolerance: all
+    errors.log.enable: "true"
+    errors.log.include.messages: "true"
+    errors.deadletterqueue.topic.name: hrpdw-dlq
+    errors.deadletterqueue.topic.replication.factor: "3"
+    errors.deadletterqueue.context.headers.enable: "true"
+    schema.history.internal.consumer.security.protocol: SASL_SSL
+    schema.history.internal.consumer.sasl.mechanism: PLAIN
+    schema.history.internal.consumer.sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username='' password='';
+    schema.history.internal.producer.security.protocol: SASL_SSL
+    schema.history.internal.producer.sasl.mechanism: PLAIN
+    schema.history.internal.producer.sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username='' password='';
+    value.converter: io.confluent.connect.avro.AvroConverter
+    value.converter.schemas.enable: "true"
+    value.converter.schema.registry.url: https://psrc-gq7pv
+    value.converter.basic.auth.credentials.source: USER_INFO
+    value.converter.basic.auth.user.info: ECJNIINJRQUGGNRY:
+    include.schema.changes: "true"
+    key.converter: io.confluent.connect.avro.AvroConverter
+    key.converter.schemas.enable: "true"
+    key.converter.schema.registry.url: https://psrc-gq7pv
+    key.converter.basic.auth.credentials.source: USER_INFO
+    key.converter.basic.auth.user.info: ECJNIINJRQUGGNRY:
+    transforms: "unwrap,ValueToKey,extractInt"
+    transforms.extractInt.type: "org.apache.kafka.connect.transforms.ExtractField$Key","transforms.extractInt.field":"ACCOUNT_HISTORY_FACT_KEY"
+    transforms.ValueToKey.type: "org.apache.kafka.connect.transforms.ValueToKey"
+    transforms.ValueToKey.fields: "ACCOUNT_HISTORY_FACT_KEY"
+    transforms.unwrap.type: "io.debezium.transforms.ExtractNewRecordState"
+    internal.key.converter: org.apache.kafka.connect.json.JsonConverter
+    internal.value.converter: org.apache.kafka.connect.json.JsonConverter
+    decimal.handling.mode: double
