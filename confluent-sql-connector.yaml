@@ -4,7 +4,7 @@ metadata:
   name: connector-sql-anthos-rmi-vips-test
   namespace: cfk-rmi-vips-testenv-source-sqlserver-kafka
   annotations:
-    configsync.gke.io/cluster-name-selector: itd-dev-uswest2-anthos-aws-kyberno-cluster
+    configsync.gke.io/cluster-name-selector: cluster
 spec:
   class: "io.debezium.connector.sqlserver.SqlServerConnector"
   taskMax: 1
@@ -21,7 +21,7 @@ spec:
     database.ssl.truststore: "${file:/mnt/secrets/paccarcacert/PaccarCACert.jks}"
     database.ssl.truststore.password: "${file:/mnt/secrets/paccarcacert/jksPassword.txt:jksPassword}"
     database.encrypt: "false"
-    schema.history.internal.kafka.bootstrap.servers: "pkc-lgk0v.us-west1.gcp.confluent.cloud:9092"
+    schema.history.internal.kafka.bootstrap.servers: "cloud:9092"
     schema.history.internal.kafka.topic: "kt_itd_test_aftersales_rmi_vips_cdc_internal_1"
     schema.history.internal.producer.sasl.jaas.config: "${file:/mnt/secrets/jaas-config/secret.txt:jaasconfig}"
     schema.history.internal.producer.sasl.mechanism: "PLAIN"
@@ -29,11 +29,11 @@ spec:
     schema.history.internal.consumer.sasl.jaas.config: "${file:/mnt/secrets/jaas-config/secret.txt:jaasconfig}"
     schema.history.internal.consumer.sasl.mechanism: "PLAIN"
     schema.history.internal.consumer.security.protocol: "SASL_SSL"
-    schema.history.internal.consumer.group.id: "k_itd_ren_aftersales_rmi_vips_cdc_test_svc1515"
+    schema.history.internal.consumer.group.id: "test_svc1515"
     key.converter: "io.confluent.connect.avro.AvroConverter"
-    key.converter.schema.registry.url: "https://psrc-k0w8v.us-central1.gcp.confluent.cloud"
+    key.converter.schema.registry.url: "https://.cloud"
     value.converter: "io.confluent.connect.avro.AvroConverter"
-    value.converter.schema.registry.url: "https://psrc-k0w8v.us-central1.gcp.confluent.cloud"
+    value.converter.schema.registry.url: "https://cloud"
     key.converter.basic.auth.credentials.source: "USER_INFO"
     key.converter.basic.auth.user.info: "${file:/mnt/secrets/user-info/user-info.txt:userinfo}"
     value.converter.basic.auth.credentials.source: "USER_INFO"
@@ -67,7 +67,7 @@ spec:
     producer.override.send.buffer.bytes: "2097164"
     group.id: "k_itd_ren_aftersales_rmi_vips_cdc_test_svc_testcdc"
     topic.prefix: "kt_itd_test_aftersales_rmi_vips_cdc"
-    confluent.topic.bootstrap.servers: "pkc-lgk0v.us-west1.gcp.confluent.cloud:9092"
+    confluent.topic.bootstrap.servers: "cloud:9092"
     time.precision.mode: connect
     decimal.handling.mode: double
     transforms: "convertTimezone,unwrap,addTopicSuffix"
@@ -83,4 +83,5 @@ spec:
     transforms.convertTimezone.converted.timezone: "America/Los_Angeles"
     transforms.convertTimezone.include.list: "source:ChassisAsBuiltTest.dbo.WrkVIPSChassis:ChassisBuildDate,ChassisAsBuiltTest.dbo.ChassisModel:Timestamp,ChassisAsBuiltTest.dbo.ChassisModelOption:Timestamp"
   restartPolicy:
+
      type: OnFailure
